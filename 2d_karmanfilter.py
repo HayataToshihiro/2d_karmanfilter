@@ -136,6 +136,7 @@ class matrix:
 ########################################
 
 def measurement(x, P):
+    print "***********"
     print "measurements"
     print measurements[n]
 
@@ -148,13 +149,8 @@ def measurement(x, P):
     P = (I - (K * H)) * P
     
     x.show()
-    #print "error y"
-    #print y
-
-    #print "P"
-    #P.show()
+    P.show()
     
-    print "---------"
     return x,P
 
 
@@ -163,10 +159,10 @@ def motion(x, P):
     print "move"
     # prediction
     x = (F * x) + u
-    P = F * P * F.transpose()
+    P = F * P * F.transpose() + Q
     
-    print "predict x"
     x.show()
+    P.show()
     return x,P
 
 ########################################
@@ -185,13 +181,22 @@ initial_xy = [0., 10.]
 #measurements = [[0., 17.], [2., 15.], [0., 13.], [2., 11.],[0.,9.],[2.,7.],[0.,5.],[2.,3.]]
 #initial_xy = [1., 19.]
 
+########################################
+
+
 dt = 0.1
 
-x = matrix([[initial_xy[0]], [initial_xy[1]], [0.], [0.]]) # initial state (location and velocity)
-u = matrix([[0.], [0.], [0.], [0.]]) 
-# external motion
+x = matrix([[initial_xy[0]], 
+            [initial_xy[1]], 
+            [0.], 
+            [0.]]) 
+        # initial state (location and velocity)
 
-#### DO NOT MODIFY ANYTHING ABOVE HERE ####
+u = matrix([[0.], 
+            [0.], 
+            [0.], 
+            [0.]]) 
+        # external motion
 
 P = matrix([[0,0,0,0],
             [0,0,0,0],
@@ -209,8 +214,8 @@ H = matrix([[1,0,0,0],
             [0,1,0,0]]) 
         # measurement function: reflect the fact that we observe x and y but not the two velocities
 
-R = matrix([[dt,0],
-            [0,dt]]) 
+R = matrix([[10,0],
+            [0,10]]) 
         # measurement uncertainty: use 2x2 matrix with 0.1 as main diagonal
 
 I = matrix([[1,0,0,0],
@@ -219,33 +224,38 @@ I = matrix([[1,0,0,0],
             [0,0,0,1]]) 
         # 4d identity matrix
 
-#### DO NOT MODIFY ANYTHING ABOVE HERE ####
-#for n in range(len(measurements)):
+G = matrix([[dt**2/2.,        0],
+            [       0, dt**2/2.],
+            [      dt,        0],
+            [       0,       dt]])
+
+sigma_a = 0.05
+        # arrange this param
+
+Q = sigma_a**2*G*G.transpose()
+        # motion noise
+
+
+
+##arrange below here
 
 x,P = motion(x, P)
 n=0 
 x,P = measurement(x, P)
 
-
 x,P = motion(x, P)
 n=1
 x,P = measurement(x, P)
-
 
 x,P = motion(x, P)
 n=2
 x,P = measurement(x, P)
 
-
 x,P = motion(x, P)
 n=3
 x,P = measurement(x, P)
 
-
 x,P = motion(x, P)
 x,P = motion(x, P)
 x,P = motion(x, P)
-#motion(x, P)
-#motion(x, P)
-#motion(x, P)
 
